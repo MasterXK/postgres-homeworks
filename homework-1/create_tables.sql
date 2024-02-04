@@ -16,7 +16,7 @@ CREATE TABLE customers(
 
 CREATE TABLE orders(
 	order_id serial PRIMARY KEY,
-	customer_id varchar(5) UNIQUE REFERENCES customers(customer_id),
+	customer_id varchar(5) REFERENCES customers(customer_id),
 	employee_id SERIAL REFERENCES employees(employee_id),
 	order_date DATE NOT NULL,
 	ship_city varchar(100)

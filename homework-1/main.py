@@ -1,10 +1,32 @@
 """Скрипт для заполнения данными таблиц в БД Postgres."""
+import csv
+
 import psycopg2
+import dotenv
+import os
 
 
-conn = psycopg2.connect(
+dotenv.load_dotenv()
+PSQL_PASS = os.getenv('PSQL_PASS')
+CSV_TO_INPUT = os.listdir("north_data")
+
+conn_params = dict(
     host="localhost",
-    database="mydatabase",
+    database="north",
     user="postgres",
-    password="12345"
+    password=PSQL_PASS
 )
+
+
+with psycopg2.connect(**conn_params) as conn:
+    for file in CSV_TO_INPUT:
+        with open(os.path.join('north_data', file), encoding='UTF-8') as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+            values = [tuple([value.strip(r'"') for value in data]) for data in reader]
+            print(values)
+            with conn.cursor() as cur:
+                cur.executemany(f"INSERT INTO {file[:-9]} VALUES ({'%s' + ', %s' * (len(headers) - 1)})", values)
+
+    conn.commit()
+
