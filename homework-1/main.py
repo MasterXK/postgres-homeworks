@@ -29,4 +29,3 @@ with psycopg2.connect(**conn_params) as conn:
                 cur.executemany(f"INSERT INTO {file[:-9]} VALUES ({'%s' + ', %s' * (len(headers) - 1)})", values)
 
     conn.commit()
-
