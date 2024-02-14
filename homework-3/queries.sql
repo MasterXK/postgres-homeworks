@@ -24,21 +24,15 @@ products.supplier_id = suppliers.supplier_id
 order by units_in_stock ASC
 
 -- 3. Список компаний заказчиков (company_name из табл customers), не сделавших ни одного заказа
-select company_name as Компания
+select distinct company_name as Компания
 from customers
-where not exists
-	(select *
-	 from orders
-	 where customers.customer_id = orders.customer_id
-	)
+join orders on customers.customer_id not in (
+	select distinct customer_id
+	from orders)
 
 -- 4. уникальные названия продуктов, которых заказано ровно 10 единиц (количество заказанных единиц см в колонке quantity табл order_details)
 -- Этот запрос написать именно с использованием подзапроса.
 select distinct product_name as Название
 from products
-where exists
-	(select quantity
-	 from order_details
-	 where products.product_id = order_details.product_id AND
-	 quantity = 10
-	)
+full join order_details using(product_id)
+where order_details.quantity = 10
